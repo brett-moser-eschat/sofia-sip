@@ -25,6 +25,10 @@ AC_SUBST(LIBVER_SOFIA_SIP_UA_GLIB_CUR, [3])
 AC_SUBST(LIBVER_SOFIA_SIP_UA_GLIB_REV, [0])
 AC_SUBST(LIBVER_SOFIA_SIP_UA_GLIB_AGE, [0])
 AC_SUBST(LIBVER_SOFIA_SIP_UA_GLIB_SOVER, [3]) # CUR-AGE
+AC_SUBST(LIBVER_SOFIA_SIP_UA_CDLIB_CUR, [1])
+AC_SUBST(LIBVER_SOFIA_SIP_UA_CDLIB_REV, [0])
+AC_SUBST(LIBVER_SOFIA_SIP_UA_CDLIB_AGE, [0])
+AC_SUBST(LIBVER_SOFIA_SIP_UA_CDLIB_SOVER, [1]) # CUR_AGE
 
 ## calls AC_CANONICAL_ macros that are required by AM_INIT_AUTOMAKE
 SAC_CANONICAL_SYSTEM_CACHE_CHECK
@@ -314,6 +318,7 @@ Makefile
 packages/Makefile
 packages/sofia-sip-ua.pc
 packages/sofia-sip-ua-glib.pc
+packages/sofia-sip-ua-cdlib.pc
 libsofia-sip-ua/Makefile
 libsofia-sip-ua/bnf/Makefile
 libsofia-sip-ua/bnf/Doxyfile
@@ -360,6 +365,9 @@ s2check/Makefile
 libsofia-sip-ua-glib/Makefile
 libsofia-sip-ua-glib/su-glib/Makefile
 libsofia-sip-ua-glib/su-glib/Doxyfile
+libsofia-sip-ua-cdlib/Makefile
+libsofia-sip-ua-cdlib/su-cdlib/Makefile
+libsofia-sip-ua-cdlib/su-cdlib/Doxyfile
 utils/Makefile
 utils/Doxyfile
 tests/Makefile

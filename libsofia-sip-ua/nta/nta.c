@@ -3080,6 +3080,28 @@ int agent_check_request_via(nta_agent_t *agent,
 
     msg_header_replace_param(msg_home(msg), v->v_common,
 			     su_strdup(msg_home(msg), received));
+
+	/* remove branch parameter and re-place it so it will be at the end */
+
+	if (sip->sip_flags & MSG_FLG_BRANCHEND)
+   {
+		const char *branchVal = NULL;
+
+		branchVal = msg_header_find_param(v->v_common, "branch");
+		if (branchVal)
+		{
+			/* this is dependent on a side-effect of how the sofia
+			   msg_params_XXX methods work. The returned pointer will have
+			   been advanced past the '=' to point to value so we can back
+			   it up to get 'name=value'. */
+			branchVal -= strlen("branch=");
+
+			msg_header_remove_param(v->v_common, "branch");
+			msg_header_add_param(msg_home(msg), v->v_common, branchVal);
+		}
+   }
+
+v->v_received = su_strdup(msg_home(msg),hostport);
     SU_DEBUG_5(("nta: Via check: %s\n", received));
   }
 

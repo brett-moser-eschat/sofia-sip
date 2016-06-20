@@ -1,0 +1,70 @@
+/**
+
+@mainpage Sofia-SIP su-cdlib Module [TODO!!]
+
+@section su_cdlib_meta Module Meta Information
+
+The su-cdlib module provides an interface to connect Sofia-SIP event loop
+to an existing CDLib IOReactor based main loop. Without this interface, a
+CDLib based application would have to create a separate thread for running
+the Sofia-SIP event loop. The application using this module MUST call
+IOReactor::create() before initializing the Sofia-SIP library and SHOULD
+call IOReactor::destroy() when finished (su-cdlib always assumes IOReactor
+singleton exists).
+
+@CONTACT Tarik Miller <tmiller@slacorp.com>
+
+@STATUS Core library
+
+@LICENSE LGPL
+
+@section su_cdlib_contents Contents of su-cdlib Module
+
+The su-cdlib module contains the public header files as follows:
+- <su_cdlib.h>    the public API of the module
+
+@section su_cdlib_examples Examples of use
+
+Below is a simple example of how to use su-cdlib:
+@code
+  #include <IOReactor.h>
+  #include <BaseApplication.h>
+
+extern "C"
+{
+  #include <sofia-sip/su_cdlib.h>
+}
+
+  class MyApp: public BaseApplication
+  {
+     /* ... */
+  };
+
+  /* ... */
+
+  /* CDLib app context */
+  MyApp myapp;
+
+  /* create reactor singleton */
+  IOReactor::create(1);
+
+  /* create a sofia event loop using su-cdlib module */
+  su_root_t *sofia_event_loop = su_cdlib_root_create(NULL);
+
+  /* run the cdlib main loop */
+  myapp.start(1);
+
+  /* cleanup sofia event loop */
+  su_root_destroy(sofia_event_loop);
+
+  /* release reactor singleton when cleaning up */
+  IOReactor::destroy();
+  /* ... app shutdown/exit */
+@endcode
+
+@section su_cdlib_todo Todo
+
+- docs.
+- update/create tests.
+
+*/

@@ -507,6 +507,11 @@ SIP_HEADER_CLASS_G(priority, "Priority", "", single);
 
 issize_t sip_priority_d(su_home_t *home, sip_header_t *h, char *s, isize_t slen)
 {
+  return sip_generic_d(home, h, s, slen);
+
+/* removed to allow acceptance of ISSI priority header which does not match *
+ * the SIP standard */
+#if 0
   sip_priority_t *priority = (sip_priority_t *)h;
 
   if (msg_token_d(&s, &priority->g_string) < 0)
@@ -516,6 +521,7 @@ issize_t sip_priority_d(su_home_t *home, sip_header_t *h, char *s, isize_t slen)
     return -1;
 
   return 0;
+#endif
 }
 
 issize_t sip_priority_e(char b[], isize_t bsiz, sip_header_t const *h, int f)

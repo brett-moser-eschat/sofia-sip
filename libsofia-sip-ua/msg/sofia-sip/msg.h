@@ -124,21 +124,24 @@ enum msg_flg_user {
   /** Make messages threadsafe. */
   MSG_FLG_THRDSAFE = (1<<15),
 
-  MSG_FLG_USERMASK = (1<<16) - 1
+  /** Force branch param to the end */
+  MSG_FLG_BRANCHEND = (1<<16),
+
+  MSG_FLG_USERMASK = (1<<17) - 1
 };
 
 /** Flags used by parser. */
 enum  msg_flg_parser {
   /** Extract headers for this message */
-  MSG_FLG_HEADERS = (1<<16),
+  MSG_FLG_HEADERS = (1<<17),
   /** Extract body for this message */
-  MSG_FLG_BODY = (1<<17),
+  MSG_FLG_BODY = (1<<18),
   /** Extract chunks for this message */
-  MSG_FLG_CHUNKS = (1<<18),
+  MSG_FLG_CHUNKS = (1<<19),
   /** Extract trailers for this message */
-  MSG_FLG_TRAILERS = (1<<19),
+  MSG_FLG_TRAILERS = (1<<20),
   /** Extract last component of this message */
-  MSG_FLG_FRAGS = (1<<20),
+  MSG_FLG_FRAGS = (1<<21),
   /** This message has been completely extracted */
   MSG_FLG_COMPLETE = (1<<24),
 
@@ -151,7 +154,7 @@ enum  msg_flg_parser {
   /** This message has timeout */
   MSG_FLG_TIMEOUT = (1<<28),
 
-  MSG_FLG_PARSERMASK = ((-1) ^ ((1<<16) - 1))
+  MSG_FLG_PARSERMASK = ((-1) ^ ((1<<17) - 1))
 };
 
 #define MSG_DO_COMPACT      MSG_FLG_COMPACT
