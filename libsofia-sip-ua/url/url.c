@@ -72,62 +72,62 @@
 
 #define RESERVED        ";/?:@&=+$,"
 #define DELIMS          "<>#%\""
-#define UNWISE		"{}|\\^[]`"
+#define UNWISE      "{}|\\^[]`"
 
-#define EXCLUDED	RESERVED DELIMS UNWISE
+#define EXCLUDED   RESERVED DELIMS UNWISE
 
-#define UNRESERVED    	"ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-                      	"abcdefghijklmnopqrstuvwxyz" \
-                      	"0123456789" \
-                      	"-_.!~*'()"
+#define UNRESERVED       "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                         "abcdefghijklmnopqrstuvwxyz" \
+                         "0123456789" \
+                         "-_.!~*'()"
 
-#define IS_EXCLUDED(u, m32, m64, m96)			\
-  (u <= ' '						\
-   || u >= '\177'					\
-   || (u < 64 ? (m32 & (1 << (63 - u)))			\
-       : (u < 96 ? (m64 & (1 << (95 - u)))		\
-	  : /*u < 128*/ (m96 & (1 << (127 - u))))) != 0)
+#define IS_EXCLUDED(u, m32, m64, m96)         \
+  (u <= ' '                  \
+   || u >= '\177'               \
+   || (u < 64 ? (m32 & (1 << (63 - u)))         \
+       : (u < 96 ? (m64 & (1 << (95 - u)))      \
+     : /*u < 128*/ (m96 & (1 << (127 - u))))) != 0)
 
-#define MASKS_WITH_RESERVED(reserved, m32, m64, m96)		\
-  if (reserved == NULL) {					\
-    m32 = 0xbe19003f, m64 = 0x8000001e, m96 = 0x8000001d;	\
-  } else do {							\
-    m32 = 0xb400000a, m64 = 0x0000001e, m96 = 0x8000001d;	\
-    								\
-    for (;reserved[0]; reserved++) {				\
-      unsigned r = reserved[0];					\
-      RESERVE(r, m32, m64, m96);				\
-    }								\
+#define MASKS_WITH_RESERVED(reserved, m32, m64, m96)      \
+  if (reserved == NULL) {               \
+    m32 = 0xbe19003f, m64 = 0x8000001e, m96 = 0x8000001d;   \
+  } else do {                     \
+    m32 = 0xb400000a, m64 = 0x0000001e, m96 = 0x8000001d;   \
+                            \
+    for (;reserved[0]; reserved++) {            \
+      unsigned r = reserved[0];               \
+      RESERVE(r, m32, m64, m96);            \
+    }                        \
   } while (0)
 
-#define RESERVE(reserved, m32, m64, m96)				\
-  if (r < 32)								\
-    ;									\
-  else if (r < 64)							\
-    m32 |= 1U << (63 - r);						\
-  else if (r < 96)							\
-    m64 |= 1U << (95 - r);						\
-  else if (r < 128)							\
+#define RESERVE(reserved, m32, m64, m96)            \
+  if (r < 32)                        \
+    ;                           \
+  else if (r < 64)                     \
+    m32 |= 1U << (63 - r);                  \
+  else if (r < 96)                     \
+    m64 |= 1U << (95 - r);                  \
+  else if (r < 128)                     \
     m96 |= 1U << (127 - r)
 
-#define MASKS_WITH_ALLOWED(allowed, mask32, mask64, mask96)	\
-  do {								\
-    if (allowed) {						\
-      for (;allowed[0]; allowed++) {				\
-	unsigned a = allowed[0];				\
-	ALLOW(a, mask32, mask64, mask96);			\
-      }								\
-    }								\
+#define MASKS_WITH_ALLOWED(allowed, mask32, mask64, mask96)   \
+  do {                        \
+    if (allowed) {                  \
+      for (;allowed[0]; allowed++) {            \
+   unsigned a = allowed[0];            \
+   ALLOW(a, mask32, mask64, mask96);         \
+      }                        \
+    }                        \
   } while (0)
 
-#define ALLOW(a, mask32, mask64, mask96)	\
-  if (a < 32)					\
-    ;						\
-  else if (a < 64)				\
-    mask32 &= ~(1U << (63 - a));		\
-  else if (a < 96)				\
-    mask64 &= ~(1U << (95 - a));		\
-  else if (a < 128)				\
+#define ALLOW(a, mask32, mask64, mask96)   \
+  if (a < 32)               \
+    ;                  \
+  else if (a < 64)            \
+    mask32 &= ~(1U << (63 - a));      \
+  else if (a < 96)            \
+    mask64 &= ~(1U << (95 - a));      \
+  else if (a < 128)            \
     mask96 &= ~(1U << (127 - a))
 
 #define NUL '\0'
@@ -144,11 +144,11 @@
 
 /* Internal prototypes */
 static char *url_canonize(char *d, char const *s, size_t n,
-			  unsigned syn33,
-			  char const allowed[]);
+           unsigned syn33,
+           char const allowed[]);
 static char *url_canonize2(char *d, char const *s, size_t n,
-			   unsigned syn33,
-			   unsigned m32, unsigned m64, unsigned m96);
+            unsigned syn33,
+            unsigned m32, unsigned m64, unsigned m96);
 static int url_tel_cmp_numbers(char const *A, char const *B);
 
 /**Test if string contains excluded or url-reserved characters.
@@ -167,7 +167,7 @@ int url_reserved_p(char const *s)
       unsigned char u = *s++;
 
       if (IS_EXCLUDED(u, RMASK1, RMASK2, RMASK3))
-	return 1;
+   return 1;
     }
 
   return 0;
@@ -328,8 +328,8 @@ char *url_unescape(char *d, char const *s)
 /** Canonize a URL component */
 static
 char *url_canonize(char *d, char const *s, size_t n,
-		   unsigned syn33,
-		   char const allowed[])
+         unsigned syn33,
+         char const allowed[])
 {
   unsigned mask32 = 0xbe19003f, mask64 = 0x8000001e, mask96 = 0x8000001d;
 
@@ -344,22 +344,22 @@ char *url_canonize(char *d, char const *s, size_t n,
 /** Canonize a URL component (with precomputed mask) */
 static
 char *url_canonize2(char *d, char const * const s, size_t n,
-		    unsigned syn33,
-		    unsigned m32, unsigned m64, unsigned m96)
+          unsigned syn33,
+          unsigned m32, unsigned m64, unsigned m96)
 {
   size_t i = 0;
 
   if (d == s)
     for (;s[i] && i < n; d++, i++)
       if (s[i] == '%')
-	break;
+   break;
 
   for (;s[i] && i < n; d++, i++) {
     unsigned char c = s[i], h1, h2;
 
     if (c != '%') {
       if (!IS_SYN33(syn33, c) && IS_EXCLUDED(c, m32, m64, m96))
-	return NULL;
+   return NULL;
       *d = c;
       continue;
     }
@@ -405,14 +405,14 @@ char *url_canonize2(char *d, char const * const s, size_t n,
  */
 static
 char *url_canonize3(char *d, char const * const s, size_t n,
-		    unsigned m32, unsigned m64, unsigned m96)
+          unsigned m32, unsigned m64, unsigned m96)
 {
   size_t i = 0;
 
   if (d == s)
     for (;s[i] && i < n; d++, i++)
       if (s[i] == '%')
-	break;
+   break;
 
   for (;s[i] && i < n; d++, i++) {
     unsigned char c = s[i], h1, h2;
@@ -508,7 +508,8 @@ void url_init(url_t *url, enum url_type_e type)
 }
 
 /** Get url type */
-su_inline enum url_type_e url_get_type(char const *scheme, size_t len)
+su_inline
+enum url_type_e url_get_type(char const *scheme, size_t len)
 {
 #define test_scheme(s) \
    if (len == strlen(#s) && !strncasecmp(scheme, #s, len)) return url_##s
@@ -630,35 +631,35 @@ int _url_d(url_t *url, char *s)
       /* WV URL may have / in user part */
       n = strcspn(s, "@#?;");
       if (s[n] == '@') {
-	user = s;
-	host = s + n + 1;
-	n += strcspn(s + n, ";?#");
+   user = s;
+   host = s + n + 1;
+   n += strcspn(s + n, ";?#");
       }
     }
     else if (host[0] == '/' && host[1] != '/') {
       /* foo:/bar or /bar - no authority, just path */
-      url->url_root = '/';	/* Absolute path */
+      url->url_root = '/';   /* Absolute path */
       host = NULL, n = 0;
     }
     else {
       if (host[0] == '/' && host[1] == '/') {
-	/* We have authority, / / foo or foo */
-	host += 2; s += 2, url->url_root = '/';
-	n = strcspn(s, "/?#@[]");
+   /* We have authority, / / foo or foo */
+   host += 2; s += 2, url->url_root = '/';
+   n = strcspn(s, "/?#@[]");
       }
       else
-	n = strcspn(s, "@;/?#");
+   n = strcspn(s, "@;/?#");
 
       if (s[n] == '@')
-	user = host, host = user + n + 1;
+   user = host, host = user + n + 1;
 
-      n += strcspn(s + n, ";/?#");	/* Find path, query and/or fragment */
+      n += strcspn(s + n, ";/?#");   /* Find path, query and/or fragment */
     }
   }
   else /* !have_authority */ {
     user = host, host = NULL;
     if (url->url_type != url_invalid)
-      n = strcspn(s, "/;?#");	/* Find params, query and/or fragment */
+      n = strcspn(s, "/;?#");   /* Find params, query and/or fragment */
     else
       n = strcspn(s, "#");
   }
@@ -671,8 +672,8 @@ int _url_d(url_t *url, char *s)
     if (url->url_type != url_unknown) {
       n = strcspn(user, ":");
       if (user[n]) {
-	user[n] = '\0';
-	url->url_password = user + n + 1;
+   user[n] = '\0';
+   url->url_password = user + n + 1;
       }
     }
   }
@@ -683,12 +684,12 @@ int _url_d(url_t *url, char *s)
     if (host[0] == '[') {
       n = strcspn(host, "]");
       if (host[n] && (host[n + 1] == '\0' || host[n + 1] == ':'))
-	n++;
+         n++;
       else
-	n = 0;
+         n = 0;
     }
     else {
-      n = strcspn(host, ":");
+       n = strcspn(host, ":");
     }
 
     /* We allow empty host by default */
@@ -715,24 +716,24 @@ int _url_d(url_t *url, char *s)
       case url_file:
       case url_rtsp:
       case url_rtspu:
-	if (!url_canonize2(port, port, SIZE_MAX, 0, RESERVED_MASK))
-	  return -1;
+      if (!url_canonize2(port, port, SIZE_MAX, 0, RESERVED_MASK))
+        return -1;
 
-	/* Check that port is really numeric or wildcard */
-	/* Port can be *digit, empty string or "*" */
-	while (*port >= '0' && *port <= '9')
-	  port++;
+      /* Check that port is really numeric or wildcard */
+      /* Port can be *digit, empty string or "*" */
+      while (*port >= '0' && *port <= '9')
+        port++;
 
-	if (port != url->url_port) {
-	  if (port[0] != '\0')
-	    return -1;
-	}
-	else if (port[0] == '\0')
-	  /* empty string */;
-	else if (port[0] == '*' && port[1] == '\0')
-	  /* wildcard */;
-	else
-	  return -1;
+      if (port != url->url_port) {
+        if (port[0] != '\0' && port[0] != ' ' && port[0] != ';')
+          return -1;
+      }
+      else if (port[0] == '\0')
+        /* empty string */;
+      else if (port[0] == '*' && port[1] == '\0')
+        /* wildcard */;
+      else
+        return -1;
       }
       host[n] = 0;
     }
@@ -817,21 +818,21 @@ int url_d(url_t *url, char *s)
   /* port is canonized by _url_d() */
   s = (char *)url->url_path;
   if (s && !url_canonize(s, s, SIZE_MAX,
-			 /* Allow all URI characters but ? */
-			 /* Allow unescaped /;?@, - but do not convert */
-			 SYN33('/') | SYN33(';') | SYN33('=') | SYN33('@') |
-			 SYN33(','),
-			 /* Convert escaped :&+$ to unescaped */
-			 ":&+$"))
+          /* Allow all URI characters but ? */
+          /* Allow unescaped /;?@, - but do not convert */
+          SYN33('/') | SYN33(';') | SYN33('=') | SYN33('@') |
+          SYN33(','),
+          /* Convert escaped :&+$ to unescaped */
+          ":&+$"))
     return -1;
 
   s = (char *)url->url_params;
   if (s && !url_canonize(s, s, SIZE_MAX,
-			 /* Allow all URI characters but ? */
-			 /* Allow unescaped ;=@, - but do not convert */
-			 SYN33(';') | SYN33('=') | SYN33('@') | SYN33(','),
-			 /* Convert escaped /:&+$ to unescaped */
-			 "/:&+$"))
+          /* Allow all URI characters but ? */
+          /* Allow unescaped ;=@, - but do not convert */
+          SYN33(';') | SYN33('=') | SYN33('@') | SYN33(','),
+          /* Convert escaped /:&+$ to unescaped */
+          "/:&+$"))
     return -1;
 
   /* Unhex alphanumeric and unreserved URI characters */
@@ -921,17 +922,17 @@ issize_t url_e(char buffer[], isize_t n, url_t const *url)
 
     if (url->url_password) {
       if (do_copy && (do_copy = 1 <= n))
-	*b = ':';
+   *b = ':';
       b++; n--;
       i = strlen(url->url_password);
       if (do_copy && (do_copy = i <= n))
-	memcpy(b, url->url_password, i);
+   memcpy(b, url->url_password, i);
       b += i; n -= i;
     }
 
     if (url->url_host) {
       if (do_copy && (do_copy = 1 <= n))
-	*b = '@';
+   *b = '@';
       b++; n--;
     }
   }
@@ -945,8 +946,8 @@ issize_t url_e(char buffer[], isize_t n, url_t const *url)
     if (url->url_port) {
       i = strlen(url->url_port) + 1;
       if (do_copy && (do_copy = i <= n)) {
-	b[0] = ':';
-	memcpy(b + 1, url->url_port, i - 1);
+   b[0] = ':';
+   memcpy(b + 1, url->url_port, i - 1);
       }
       b += i; n -= i;
     }
@@ -955,7 +956,7 @@ issize_t url_e(char buffer[], isize_t n, url_t const *url)
   if (url->url_path) {
     if (url->url_root) {
       if (do_copy && (do_copy = 1 <= n))
-	b[0] = '/';
+   b[0] = '/';
       b++, n--;
     }
     i = strlen(url->url_path);
@@ -978,8 +979,8 @@ issize_t url_e(char buffer[], isize_t n, url_t const *url)
       if (!p) continue;
       i = strlen(p) + 1;
       if (do_copy && (do_copy = i <= n)) {
-	*b = sep[j];
-	memcpy(b + 1, p, i - 1);
+   *b = sep[j];
+   memcpy(b + 1, p, i - 1);
       }
       b += i; n -= i;
     }
@@ -1014,10 +1015,10 @@ isize_t url_len(url_t const * url)
     rv += url->url_host != NULL;  /* plus '@' */
   }
   if (url->url_host) rv += strlen(url->url_host);
-  if (url->url_port) rv += strlen(url->url_port) + 1;	        /* plus ':' */
+  if (url->url_port) rv += strlen(url->url_port) + 1;           /* plus ':' */
   if (url->url_path) rv += strlen(url->url_path) + 1;     /* plus initial / */
   if (url->url_params) rv += strlen(url->url_params) + 1; /* plus initial ; */
-  if (url->url_headers) rv += strlen(url->url_headers) + 1;	/* plus '?' */
+  if (url->url_headers) rv += strlen(url->url_headers) + 1;   /* plus '?' */
   if (url->url_fragment) rv += strlen(url->url_fragment) + 1;   /* plus '#' */
 
   return rv;
@@ -1118,7 +1119,9 @@ issize_t url_dup(char *buf, isize_t bufsize, url_t *dst, url_t const *src)
     strcpy(buf, (char *)src);
     memset(dst, 0, sizeof(*dst));
     if (url_d(dst, buf) < 0)
+{
       return -1;
+}
 
     return n;
   }
@@ -1148,22 +1151,22 @@ issize_t url_dup(char *buf, isize_t bufsize, url_t *dst, url_t const *src)
       *dstp = url_scheme((enum url_type_e)dst->url_type);
 
     if (*dstp != NULL)
-      dstp++, srcp++;	/* Skip scheme if it is constant */
+      dstp++, srcp++;   /* Skip scheme if it is constant */
 
     if (dst != dst0 && buf != NULL && bufsize != 0)
       for (; srcp <= &src->url_fragment; srcp++, dstp++)
-	if (*srcp) {
-	  char *next = copy(b, end, *srcp);
+   if (*srcp) {
+     char *next = copy(b, end, *srcp);
 
-	  if (next > end)
-	    break;
+     if (next > end)
+       break;
 
-	  *dstp = b, b = next;
-	}
+     *dstp = b, b = next;
+   }
 
     for (; srcp <= &src->url_fragment; srcp++)
       if (*srcp) {
-	b += strlen(*srcp) + 1;
+   b += strlen(*srcp) + 1;
       }
 
     return b - buf;
@@ -1217,9 +1220,9 @@ url_t *url_hdup(su_home_t *home, url_t const *src)
       ssize_t actual;
       actual = url_dup((char *)(dst + 1), len - sizeof(*src), dst, src);
       if (actual < 0)
-	su_free(home, dst), dst = NULL;
+   su_free(home, dst), dst = NULL;
       else
-	assert(len == sizeof(*src) + actual);
+   assert(len == sizeof(*src) + actual);
     }
     return dst;
   }
@@ -1305,8 +1308,8 @@ char *url_as_string(su_home_t *home, url_t const *url)
  * @retval zero     if not found.
  */
 isize_t url_param(char const *params,
-		  char const *tag,
-		  char value[], isize_t vlen)
+        char const *tag,
+        char value[], isize_t vlen)
 {
   size_t n, tlen, flen;
   char *p;
@@ -1325,15 +1328,15 @@ isize_t url_param(char const *params,
     }
     if (strncasecmp(p, tag, tlen) == 0) {
       if (n == tlen) {
-	if (vlen > 0)
-	  value[0] = '\0';
-	return 1;
+   if (vlen > 0)
+     value[0] = '\0';
+   return 1;
       }
       if (p[tlen] != '=')
-	continue;
+   continue;
       flen = n - tlen - 1;
       if (flen >= (size_t)vlen)
-	return flen + 1;
+   return flen + 1;
       memcpy(value, p + tlen + 1, flen);
       value[flen] = '\0';
       return flen + 1;
@@ -1394,27 +1397,28 @@ char *url_strip_param_string(char *params, char const *name)
 
     for (i = 0; params[i];) {
       if (strncasecmp(params + i, name, n) ||
-	  (params[i + n] != '=' && params[i + n] != ';' && params[i + n])) {
-	i = i + strcspn(params + i, ";");
-	if (!params[i++])
-	  break;
-	continue;
+     (params[i + n] != '=' && params[i + n] != ';' && params[i + n])) {
+   i = i + strcspn(params + i, ";");
+   if (!params[i++])
+     break;
+   continue;
       }
       remove = n + strcspn(params + i + n, ";");
       if (params[i + remove] == ';')
-	remove++;
+   remove++;
 
       if (i == 0) {
-	params += remove;
-	continue;
+   params += remove;
+   continue;
       }
 
       rest = strlen(params + i + remove);
       if (!rest) {
-	params[i - 1] = '\0';
-	break;
+   if (i == 0)
+     return NULL;      /* removed everything */
+   params[i - 1] = '\0';
+   break;
       }
-
       memmove(params + i, params + i + remove, rest + 1);
     }
 
@@ -1472,11 +1476,11 @@ int url_strip_transport2(url_t *url, int modify)
 
     if (p != d) {
       if (d != url->url_params)
-	d++;
+   d++;
       if (p != d) {
-	if (!modify)
-	  return 1;
-	memmove(d, p, n + 1);
+   if (!modify)
+     return 1;
+   memmove(d, p, n + 1);
       }
     }
     d += n;
@@ -1484,7 +1488,7 @@ int url_strip_transport2(url_t *url, int modify)
 
   if (d == p)
     return 0;
-  else if (d + 1 == p)		/* empty param */
+  else if (d + 1 == p)      /* empty param */
     return 0;
   else if (!modify)
     return 1;
@@ -1584,12 +1588,12 @@ int url_cmp(url_t const *a, url_t const *b)
       return rv;
   }
 
-  url_type = a->url_type;	/* Or b->url_type, they are equal! */
+  url_type = a->url_type;   /* Or b->url_type, they are equal! */
 
   if (url_type <= url_unknown &&
       ((rv = !a->url_scheme - !b->url_scheme) ||
        (a->url_scheme && b->url_scheme &&
-	(rv = strcasecmp(a->url_scheme, b->url_scheme)))))
+   (rv = strcasecmp(a->url_scheme, b->url_scheme)))))
     return rv;
 
   if ((rv = host_cmp(a->url_host, b->url_host)))
@@ -1652,7 +1656,7 @@ int url_tel_cmp_numbers(char const *A, char const *B)
     do {
       a = *A++;
       if (a == '%' && IS_HEX(A[0]) && IS_HEX(A[1]))
-	a = (UNHEX(A[0]) << 4) | UNHEX(A[1]), A +=2;
+   a = (UNHEX(A[0]) << 4) | UNHEX(A[1]), A +=2;
     } while (a == ' ' || a == '-' || a == '.' || a == '(' || a == ')');
 
     if (isupper(a))
@@ -1661,7 +1665,7 @@ int url_tel_cmp_numbers(char const *A, char const *B)
     do {
       b = *B++;
       if (b == '%' && IS_HEX(B[0]) && IS_HEX(B[1]))
-	b = (UNHEX(B[0]) << 4) | UNHEX(B[1]), B +=2;
+   b = (UNHEX(B[0]) << 4) | UNHEX(B[1]), B +=2;
     } while (b == ' ' || b == '-' || b == '.' || b == '(' || b == ')');
 
     if (isupper(b))
@@ -1692,12 +1696,12 @@ int url_cmp_all(url_t const *a, url_t const *b)
   if ((rv = a->url_type - b->url_type))
     return rv;
 
-  url_type = a->url_type;	/* Or b->url_type, they are equal! */
+  url_type = a->url_type;   /* Or b->url_type, they are equal! */
 
   if (url_type <= url_unknown &&
       ((rv = !a->url_scheme - !b->url_scheme) ||
        (a->url_scheme && b->url_scheme &&
-	(rv = strcasecmp(a->url_scheme, b->url_scheme)))))
+   (rv = strcasecmp(a->url_scheme, b->url_scheme)))))
     return rv;
 
   if ((rv = a->url_root - b->url_root))
@@ -1782,29 +1786,29 @@ int url_cmp_all(url_t const *a, url_t const *b)
 char const *url_port_default(enum url_type_e url_type)
 {
   switch (url_type) {
-  case url_sip:			/* "sip:" */
+  case url_sip:         /* "sip:" */
     return "5060";
-  case url_sips:		/* "sips:" */
+  case url_sips:      /* "sips:" */
     return "5061";
-  case url_http:		/* "http:" */
+  case url_http:      /* "http:" */
     return "80";
-  case url_https:		/* "https:" */
+  case url_https:      /* "https:" */
     return "443";
-  case url_ftp:			/* "ftp:" */
-  case url_file:		/* "file:" */
+  case url_ftp:         /* "ftp:" */
+  case url_file:      /* "file:" */
     return "21";
-  case url_rtsp:		/* "rtsp:" */
-  case url_rtspu:		/* "rtspu:" */
+  case url_rtsp:      /* "rtsp:" */
+  case url_rtspu:      /* "rtspu:" */
     return "554";
-  case url_mailto:		/* "mailto:" */
+  case url_mailto:      /* "mailto:" */
     return "25";
 
-  case url_any:			/* "*" */
+  case url_any:         /* "*" */
     return "*";
 
   case url_msrp:
   case url_msrps:
-    return "9999";		/* XXXX */
+    return "9999";      /* XXXX */
 
   case url_tel:
   case url_fax:
@@ -1814,7 +1818,7 @@ char const *url_port_default(enum url_type_e url_type)
   case url_cid:
   case url_wv:
 
-  default:			/* Unknown scheme */
+  default:         /* Unknown scheme */
     return "";
   }
 }
@@ -1845,7 +1849,7 @@ char const *url_tport_default(enum url_type_e url_type)
   case url_msrps:
     return "tls";
 
-  case url_any:			/* "*" */
+  case url_any:         /* "*" */
   case url_tel:
   case url_fax:
   case url_modem:
@@ -1854,7 +1858,7 @@ char const *url_tport_default(enum url_type_e url_type)
   case url_cid:
   case url_wv:
 
-  default:			/* Unknown scheme */
+  default:         /* Unknown scheme */
     return "*";
   }
 }
@@ -1903,7 +1907,7 @@ int url_sanitize(url_t *url)
   else if (strncasecmp(url->url_host, "ftp.", strlen("ftp.")) == 0)
     url->url_type = url_ftp, url->url_scheme = "ftp", url->url_root = '/';
   else if (strncasecmp(url->url_host, "www.", strlen("www.")) == 0
-	   || url->url_path)
+      || url->url_path)
     url->url_type = url_http, url->url_scheme = "http", url->url_root = '/';
   else
     url->url_type = url_sip, url->url_scheme = "sip";
@@ -1926,11 +1930,11 @@ void canon_update(su_md5_t *md5, char const *s, size_t n, char const *allow)
       c = (UNHEX(s[i+1]) << 4) | UNHEX(s[i+2]);
 #undef    UNHEX
       if (c != '%' && c > ' ' && c < '\177' &&
-	  (!strchr(EXCLUDED, c) || strchr(allow, c))) {
-	if (i != j)
-	  su_md5_iupdate(md5, s + j, i - j);
-	su_md5_iupdate(md5, &c, 1);
-	j = i + 3;
+     (!strchr(EXCLUDED, c) || strchr(allow, c))) {
+   if (i != j)
+     su_md5_iupdate(md5, s + j, i - j);
+   su_md5_iupdate(md5, &c, 1);
+   j = i + 3;
       }
       i += 2;
     }
@@ -1987,7 +1991,7 @@ void url_string_update(su_md5_t *md5, char const *s)
       s += n + 1; n = 0;
     }
     else
-      su_md5_iupdate(md5, "", 1);	/* user */
+      su_md5_iupdate(md5, "", 1);   /* user */
     n += strcspn(s + n, "/;?#");
   }
   else if (have_authority) {
@@ -2014,15 +2018,15 @@ void url_string_update(su_md5_t *md5, char const *s)
       p = colon ? (size_t)(colon - s) : n;
       canon_update(md5, s, p, SIP_USER_UNRESERVED);
       s += n + 1;
-      n = strcspn(s, "/;?#");	/* Until path, query or fragment */
+      n = strcspn(s, "/;?#");   /* Until path, query or fragment */
     }
     else {
-      su_md5_iupdate(md5, "", 1);	/* user */
-      n += strcspn(s + n, "/;?#");	/* Until path, query or fragment */
+      su_md5_iupdate(md5, "", 1);   /* user */
+      n += strcspn(s + n, "/;?#");   /* Until path, query or fragment */
     }
   }
   else /* if (!have_authority) */ {
-    n = strcspn(s, ":/;?#");	/* Until pass, path, query or fragment */
+    n = strcspn(s, ":/;?#");   /* Until pass, path, query or fragment */
 
     canon_update(md5, s, n, ""); /* user */
     su_md5_update(md5, "\0", 1); /* host, no port */
@@ -2030,7 +2034,7 @@ void url_string_update(su_md5_t *md5, char const *s)
     return;
   }
 
-  if (n > 0 && s[0] == '[') {	/* IPv6reference */
+  if (n > 0 && s[0] == '[') {   /* IPv6reference */
     colon = memchr(s, ']', n);
     if (colon == NULL || ++colon == s + n || *colon != ':')
       colon = NULL;
@@ -2044,7 +2048,7 @@ void url_string_update(su_md5_t *md5, char const *s)
   }
   else {
     canon_update(md5, s, n, ""); /* host */
-    su_md5_strupdate(md5, url_port_default(type));	/* port */
+    su_md5_strupdate(md5, url_port_default(type));   /* port */
   }
 
   /* ignore parameters/path/headers.... */
@@ -2111,7 +2115,7 @@ void url_digest(void *hash, int hsize, url_t const *url, char const *key)
  * @since New in @VERSION_1_12_4.
  */
 char *url_query_as_header_string(su_home_t *home,
-				 char const *query)
+             char const *query)
 {
   size_t i, j, n, b_start = 0, b_len = 0;
   char *s = su_strdup(home, query);
@@ -2125,7 +2129,7 @@ char *url_query_as_header_string(su_home_t *home,
       break;
     if (n == 4 && su_strncasecmp(query + i, "body", 4) == 0) {
       if (b_start)
-	break;
+   break;
       b_start = i + n + 1, b_len = strcspn(query + b_start, "&");
       i = b_start + b_len;
       if (!query[i])
@@ -2134,7 +2138,7 @@ char *url_query_as_header_string(su_home_t *home,
       continue;
     }
     if (i != j)
-      memcpy(s + j, query + i, n);
+      memmove(s + j, query + i, n);
     s[j + n] = ':';
     i += n + 1, j += n + 1;
     n = strcspn(query + i, "&");
