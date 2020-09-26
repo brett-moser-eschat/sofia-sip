@@ -70,7 +70,7 @@ typedef struct sres_blocking_context_s sres_blocking_context_t;
 #include <sofia-sip/su_errno.h>
 
 #if HAVE_POLL
-#include <sys/poll.h>
+#include <poll.h>
 #elif HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
