@@ -76,7 +76,7 @@ typedef unsigned _int32 uint32_t;
 #include <sofia-sip/tstdef.h>
 
 #if HAVE_POLL
-#include <poll.h>
+#include <sys/poll.h>
 #elif HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif

@@ -49,7 +49,7 @@ char const name[] = "sip_resolve";
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <poll.h>
+#include <sys/poll.h>
 
 enum progress {
   querying_naptr,
