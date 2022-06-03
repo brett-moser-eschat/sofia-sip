@@ -448,42 +448,6 @@ AC_DEFINE([HAVE_CLOCK_MONOTONIC], 1,
 #include <time.h>])
 fi
 
-# CDLib option
-AC_ARG_WITH(cdlib,
-[  --with-cdlib            use CDLIB support (default = not included)],
-[with_cdlib=yes],
-[with_cdlib=no])
-
-# if no CDLib path explicitly defined then just assume 'cdlib/src' is at the
-# same level as the sofia src top dir. cdlib does not have a pkg-config that
-# we can test.
-AC_ARG_WITH(cdlib-dir,
-[  --with-cdlib-dir=PATH   explicitly define CDLib path (default = ../cdlib/src)],
-[],
-[with_cdlib_dir="../cdlib/src"])
-
-# hack.. paths containing tilde ('~') were not getting expanded so using the
-# following line to pass the var through eval to force expansion before using
-# it further.
-with_cdlib_dir=`eval echo $with_cdlib_dir`
-
-AS_IF([test "$with_cdlib" = no || test "$with_cdlib_dir" = "no"],
-[],
-[AS_IF([test -d $with_cdlib_dir],
- [
-   HAVE_CDLIB=yes
-   CDLIB_LIBS="-L$with_cdlib_dir -lcdlib"
-   CDLIB_CFLAGS="-I$with_cdlib_dir"
- ],
- [])
-])
-
-AM_CONDITIONAL([HAVE_CDLIB], [test "x$HAVE_CDLIB" = xyes])
-AC_SUBST([CDLIB_LIBS])
-AC_SUBST([CDLIB_CFLAGS])
-AC_SUBST([CDLIB_VERSION])
-# AC_SUBST([SOFIA_CDLIB_PKG_REQUIRES])
-
 # GLib option
 # No GLib path explicitly defined, use pkg-config
 AC_ARG_WITH(glib,
