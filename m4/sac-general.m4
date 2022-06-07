@@ -129,7 +129,6 @@ AC_SUBST([CWFLAG], [$sac_cv_cwflag])
 
 AC_ARG_VAR([SOFIA_CFLAGS], [CFLAGS not used during configure])
 AC_ARG_VAR([SOFIA_GLIB_CFLAGS], [Extra CFLAGS for libsofia-sip-ua-glib])
-AC_ARG_VAR([SOFIA_CDLIB_CFLAGS], [Extra CFLAGS for libsofia-sip-ua-cdlib])
 ])
 
 dnl ======================================================================

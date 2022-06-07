@@ -22,6 +22,11 @@
  *
  */
 
+/*
+ * This file has been changed by San Luis Aviation Inc. starting on 2016-06-20
+ * All changes made to this library are made freely available under the original terms of the GNU Lesser General Public License version 2.1
+ */
+
 #ifndef SU_OS_NW_H
 /** Defined when <sofia-sip/su_os_nw.h> has been included. */
 #define SU_OS_NW_H

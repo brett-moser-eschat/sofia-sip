@@ -22,6 +22,11 @@
  *
  */
 
+/*
+ * This file has been changed by San Luis Aviation Inc. starting on 2016-06-20
+ * All changes made to this library are made freely available under the original terms of the GNU Lesser General Public License version 2.1
+ */
+
 /**@defgroup su_uniqueid GloballyUniqueIDs
  *
  * Globally unique IDs.

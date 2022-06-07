@@ -1,3 +1,0 @@
---with-cdlib
---with-cdlib-dir=<path_to_cdlb_headers>   (eg.  --with-cdlib-dir=/home/tmiller/work/cdlib/src )
-

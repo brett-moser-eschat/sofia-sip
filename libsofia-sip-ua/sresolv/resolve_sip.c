@@ -22,6 +22,11 @@
  *
  */
 
+/*
+ * This file has been changed by San Luis Aviation Inc. starting on 2020-09-25
+ * All changes made to this library are made freely available under the original terms of the GNU Lesser General Public License version 2.1
+ */
+
 /**@file resolve_sip.c Use sresolv library to resolve a SIP or SIPS domain.
  *
  * This is an example program for @b sresolv library.
