@@ -4163,8 +4163,22 @@ static void signal_call_state(nua_handle_t *nh,
       ss->ss_state = next_state;
   }
 
+SU_DEBUG_5(("ss_state=%d next_state=%d (ready=%d,terminated=%d) nh_active_call=%d",
+         ss?ss->ss_state:-1,
+         next_state,
+         nua_callstate_ready,
+         nua_callstate_terminated,
+         nh?nh->nh_active_call:-1));
+
   if (next_state == nua_callstate_init)
     next_state = nua_callstate_terminated;
+
+SU_DEBUG_5(("ss_state=%d next_state=%d (ready=%d,terminated=%d) nh_active_call=%d",
+         ss?ss->ss_state:-1,
+         next_state,
+         nua_callstate_ready,
+         nua_callstate_terminated,
+         nh?nh->nh_active_call:-1));
 
   if (ss && ss->ss_state == nua_callstate_ready)
     nh->nh_active_call = 1;
