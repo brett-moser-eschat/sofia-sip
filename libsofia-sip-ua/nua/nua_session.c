@@ -4213,7 +4213,7 @@ SU_DEBUG_5(("ss_state=%d next_state=%d (ready=%d,terminated=%d) nh_active_call=%
     nua_stack_tevent(nh->nh_nua, nh, NULL, nua_i_state,
 		     status, phrase,
 		     NUTAG_CALLSTATE(next_state),
-		     NH_ACTIVE_MEDIA_TAGS(1, ds->ds_soa),
+		     NH_ACTIVE_MEDIA_TAGS(1, ds?ds->ds_soa:NULL),
 		     /* NUTAG_SOA_SESSION(ds->ds_soa), */
 		     TAG_IF(offer_recv, NUTAG_OFFER_RECV(offer_recv)),
 		     TAG_IF(answer_recv, NUTAG_ANSWER_RECV(answer_recv)),
@@ -4228,7 +4228,7 @@ SU_DEBUG_5(("ss_state=%d next_state=%d (ready=%d,terminated=%d) nh_active_call=%
 
   if (next_state == nua_callstate_ready && ss_state <= nua_callstate_ready) {
     nua_stack_tevent(nh->nh_nua, nh, NULL, nua_i_active, status, "Call active",
-		     NH_ACTIVE_MEDIA_TAGS(1, ds->ds_soa),
+		     NH_ACTIVE_MEDIA_TAGS(1, ds?ds->ds_soa:NULL),
 		     /* NUTAG_SOA_SESSION(ds->ds_soa), */
 		     TAG_END());
   }
