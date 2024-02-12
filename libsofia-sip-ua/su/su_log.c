@@ -134,7 +134,20 @@ void su_vllog(su_log_t *log, unsigned level, char const *fmt, va_list ap)
   }
 
   if (logger)
-    logger(stream, fmt, ap);
+    logger(stream, level, log->log_file, log->log_line, fmt, ap);
+}
+
+void su_vllog0(su_log_t *log, unsigned level, char const *fmt, va_list ap)
+{
+   su_vllog(log, level, fmt, ap);
+   log->log_file = "";
+   log->log_line = 0;
+}
+
+void su_log_set_line(su_log_t *log, const char *file, unsigned line)
+{
+   log->log_file = file;
+   log->log_line = line;
 }
 
 static char const not_initialized[1];

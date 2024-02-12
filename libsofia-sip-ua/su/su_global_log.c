@@ -63,12 +63,14 @@ extern char const SU_DEBUG[];
  * #su_log_global is set using #SU_DEBUG environment variable.
  */
 su_log_t su_log_global[1] = {{
-  sizeof(su_log_t),
-  "su",
-  "SU_DEBUG",
-  SU_DEBUG_,
-  SU_LOG_MAX,
-  0,
-  NULL,
-  NULL
+  sizeof(su_log_t),    /* log_size */
+  "su",                /* log_name */
+  "SU_DEBUG",          /* log_env */
+  SU_DEBUG_,           /* log_default */
+  SU_LOG_MAX,          /* log_level */
+  "",                  /* log_file */
+  0,                   /* log_line */
+  0,                   /* log_init */
+  NULL,                /* log_logger */
+  NULL                 /* log_stream */
 }};

@@ -39,11 +39,50 @@
 #include <sofia-sip/su_debug.h>
 
 /** Log into FILE, by default stderr. */
-static void default_logger(void *stream, char const *fmt, va_list ap)
+static void default_logger(
+      void *stream,
+      unsigned level,
+      char const *file,
+      unsigned line,
+      char const *fmt,
+      va_list ap)
 {
+  char buf[1024];
+  char *p = buf;
+  int l=0;
+  int r=1024;
   FILE *f = stream ? (FILE *)stream : stderr;
 
-  vfprintf(f, fmt, ap);
+  if (file != NULL && file[0] != '\0')
+  {
+     l = snprintf(buf, 1024, "%s:%u: ", file, line);
+     if (l > 0)
+     {
+        if (l<1024)
+        {
+           --l; // remove trailing '\0'
+           p += l;
+           r = 1024 - l;
+           vsnprintf(p, r, fmt, ap);
+           fprintf(f, "%s", buf);
+        }
+        else
+        {
+           // truncated.
+           // TODO -- filename + line_num exceeded 1023 chars??
+           // no-op for now
+        }
+     }
+     else
+     {
+        // TODO -- string printing error of some sort
+        // no-op for now
+     }
+  }
+  else
+  {
+     vfprintf(f, fmt, ap);
+  }
 }
 
 /**@var SOFIA_DEBUG
@@ -81,12 +120,17 @@ extern char const SOFIA_DEBUG[];
  * variable.
  */
 su_log_t su_log_default[1] = {{
-  sizeof(su_log_t),
-  "sofia",		/* Log name */
-  "SOFIA_DEBUG",	/* Environment variable controlling logging level */
-  SOFIA_DEBUG_,		/* Default level */
-  SU_LOG_MAX,		/* Maximum log level */
-  0,
-  default_logger,
-  NULL
+  sizeof(su_log_t),    /* log_size */
+  "sofia",             /* log_name */
+      /* Environment variable controlling logging level */
+  "SOFIA_DEBUG",       /* log_env */
+      /* Default level */
+  SOFIA_DEBUG_,        /* log_default */
+      /* Maximum log level */
+  SU_LOG_MAX,          /* log_level */
+  "",                  /* log_file */
+  0,                   /* log_line */
+  0,                   /* log_init */
+  default_logger,      /* log_logger */
+  NULL                 /* log_stream */
 }};
