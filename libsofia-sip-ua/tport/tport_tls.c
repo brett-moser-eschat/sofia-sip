@@ -151,7 +151,7 @@ void tls_log_errors(unsigned level, char const *s, unsigned long e)
   for (; e != 0; e = ERR_get_error()) {
     if (level <= tport_log->log_level) {
       const char *error = ERR_lib_error_string(e);
-      const char *func = ERR_func_error_string(e);
+      const char *func = ""; /*ERR_func_error_string(e);*/
       const char *reason = ERR_reason_error_string(e);
 
       su_llog(tport_log, level, "%s: %08lx:%s:%s:%s\n",
@@ -296,10 +296,13 @@ int tls_init_context(tls_t *tls, tls_issues_t const *ti)
     /* meth = SSLv3_method(); */
     /* meth = SSLv23_method(); */
 
+    /*
     if (ti->version)
       meth = TLSv1_method();
     else
       meth = SSLv23_method();
+    */
+    meth = TLS_method();
 
     tls->ctx = SSL_CTX_new((SSL_METHOD*)meth);
   }
@@ -448,7 +451,7 @@ tls_t *tls_init_master(tls_issues_t *ti)
     return NULL;
   }
 
-  RAND_pseudo_bytes(sessionId, sizeof(sessionId));
+  RAND_bytes(sessionId, sizeof(sessionId));
 
   SSL_CTX_set_session_id_context(tls->ctx,
                                  (void*) sessionId,
