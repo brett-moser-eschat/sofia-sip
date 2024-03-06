@@ -190,9 +190,9 @@ struct su_source_s {
   su_base_port_t   sup_base[1];
 
   GThread         *sup_tid;
-  GStaticMutex     sup_obtained[1];
+  GMutex           sup_obtained[1];
 
-  GStaticMutex     sup_mutex[1];
+  GMutex           sup_mutex[1];
 
   GSource         *sup_source;	/**< Backpointer to source */
   GMainLoop       *sup_main_loop; /**< Reference to mainloop while running */
@@ -280,9 +280,9 @@ static int su_source_port_init(su_port_t *self,
 
   self->sup_source = gs;
 
-  g_static_mutex_init(self->sup_obtained);
+  g_mutex_init(self->sup_obtained);
 
-  g_static_mutex_init(self->sup_mutex);
+  g_mutex_init(self->sup_mutex);
 
   return su_base_port_init(self, vtable);
 }
@@ -292,8 +292,12 @@ static void su_source_port_deinit(su_port_t *self)
 {
   su_base_port_deinit(self);
 
-  g_static_mutex_free(self->sup_mutex);
-  g_static_mutex_free(self->sup_obtained);
+  /*
+  g_mutex_free(self->sup_mutex);
+  g_mutex_free(self->sup_obtained);
+  */
+  g_mutex_clear(self->sup_mutex);
+  g_mutex_clear(self->sup_obtained);
 
   if (self->sup_indices)
     free (self->sup_indices), self->sup_indices = NULL;
@@ -359,13 +363,13 @@ static int su_source_thread(su_port_t *self, enum su_port_thread_op op)
     if (self->sup_tid != me)
       return errno = EALREADY, -1;
     self->sup_tid = NULL;
-    g_static_mutex_unlock(self->sup_obtained);
+    g_mutex_unlock(self->sup_obtained);
     return 0;
 
   case su_port_thread_op_obtain:
     if (su_home_threadsafe(su_port_home(self)) == -1)
       return -1;
-    g_static_mutex_lock(self->sup_obtained);
+    g_mutex_lock(self->sup_obtained);
     self->sup_tid = me;
     return 0;
 
@@ -398,11 +402,16 @@ gboolean su_source_prepare(GSource *gs, gint *return_tout)
 
   if (self->sup_base->sup_timers || self->sup_base->sup_deferrable) {
     su_time_t now;
+    /*
     GTimeVal  gtimeval;
 
     g_source_get_current_time(gs, &gtimeval);
     now.tv_sec = gtimeval.tv_sec + 2208988800UL;
     now.tv_usec = gtimeval.tv_usec;
+    */
+    gint64 gtime = g_get_real_time();
+    now.tv_sec = (gtime / 1000000);
+    now.tv_usec = gtime - (now.tv_sec * 1000000);
 
     tout = su_timer_next_expires(&self->sup_base->sup_timers, now);
 
@@ -466,15 +475,21 @@ gboolean su_source_dispatch(GSource *gs,
 
   if (self->sup_base->sup_timers || self->sup_base->sup_deferrable) {
     su_time_t now;
-    GTimeVal  gtimeval;
+    //GTimeVal  gtimeval;
+    gint64 gtime;
     su_duration_t tout;
 
     tout = SU_DURATION_MAX;
 
+    /*
     g_source_get_current_time(gs, &gtimeval);
 
     now.tv_sec = gtimeval.tv_sec + 2208988800UL;
     now.tv_usec = gtimeval.tv_usec;
+    */
+    gtime = g_get_real_time();
+    now.tv_sec = gtime / 1000000;
+    now.tv_usec = gtime - (now.tv_sec * 1000000);
 
     su_timer_expire(&self->sup_base->sup_timers, &tout, now);
     su_timer_expire(&self->sup_base->sup_deferrable, &tout, now);
@@ -511,7 +526,7 @@ static void su_source_lock(su_port_t *self, char const *who)
 {
   PORT_LOCK_DEBUG(("%p at %s locking(%p)...",
 		   (void *)g_thread_self(), who, self));
-  g_static_mutex_lock(self->sup_mutex);
+  g_mutex_lock(self->sup_mutex);
 
   PORT_LOCK_DEBUG((" ...%p at %s locked(%p)...",
 		   (void *)g_thread_self(), who, self));
@@ -519,7 +534,7 @@ static void su_source_lock(su_port_t *self, char const *who)
 
 static void su_source_unlock(su_port_t *self, char const *who)
 {
-  g_static_mutex_unlock(self->sup_mutex);
+  g_mutex_unlock(self->sup_mutex);
 
   PORT_LOCK_DEBUG((" ...%p at %s unlocked(%p)\n",
 		   (void *)g_thread_self(), who, self));
