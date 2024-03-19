@@ -53,7 +53,14 @@ typedef struct su_log_s su_log_t;
 SOFIA_BEGIN_DECLS
 
 /** Prototype for logging function */
-typedef void (su_logger_f)(void *stream, char const *fmt, va_list ap);
+//typedef void (su_logger_f)(void *stream, char const *fmt, va_list ap);
+typedef void (su_logger_f)(
+      void *stream,
+      unsigned level,
+      char const *file,
+      unsigned line,
+      char const *fmt,
+      va_list ap);
 
 /** Log object. */
 struct su_log_s {
@@ -62,6 +69,8 @@ struct su_log_s {
   char const  *log_env;
   unsigned     log_default;
   unsigned     log_level;
+  char const  *log_file;
+  unsigned     log_line;
   int          log_init;
 
   su_logger_f *log_logger;
@@ -72,7 +81,18 @@ enum { SU_LOG_MAX = 9 };
 
 /** Initialize a su_log_t structure */
 #define SU_LOG_INIT(name, env, level) \
-  { sizeof(su_log_t), name, env, level, SU_LOG_MAX, 0, NULL, NULL, }
+  { \
+     sizeof(su_log_t), /*log_size*/ \
+     name,             /*log_name*/ \
+     env,              /*log_env*/ \
+     level,            /*log_default*/ \
+     SU_LOG_MAX,       /*log_level*/ \
+     "",               /*log_file*/ \
+     0,                /*log_line*/ \
+     0,                /*log_init*/ \
+     NULL,             /*log_logger*/ \
+     NULL,             /*log_stream*/ \
+  }
 
 SOFIAPUBFUN void su_log(char const *fmt, ...)
   __attribute__ ((__format__ (printf, 1, 2)));
@@ -81,6 +101,9 @@ SOFIAPUBFUN void su_llog(su_log_t *log, unsigned level, char const *fmt, ...)
   __attribute__ ((__format__ (printf, 3, 4)));
 SOFIAPUBFUN void su_vllog(su_log_t *log, unsigned level,
 			  char const *fmt, va_list ap);
+SOFIAPUBFUN void su_vllog0(su_log_t *log, unsigned level,
+			  char const *fmt, va_list ap);
+SOFIAPUBFUN void su_log_set_line(su_log_t *log, const char *file, unsigned line);
 SOFIAPUBFUN void su_log_redirect(su_log_t *log, su_logger_f *f, void *stream);
 SOFIAPUBFUN void su_log_set_level(su_log_t *log, unsigned level);
 SOFIAPUBFUN void su_log_soft_set_level(su_log_t *log, unsigned level);

@@ -76,7 +76,7 @@ SOFIAPUBVAR su_log_t SU_LOG[];
   su_inline void su_debug_##level(char const *fmt, ...) \
     __attribute__ ((__format__ (printf, 1, 2))); \
   su_inline void su_debug_##level(char const *fmt, ...) \
-    { va_list ap; va_start(ap, fmt); su_vllog(SU_LOG, level, fmt, ap); va_end(ap); }
+    { va_list ap; va_start(ap, fmt); su_vllog0(SU_LOG, level, fmt, ap); va_end(ap); }
 
 SU_DEBUG_DEF(0)
 /** Log messages at level 0.
@@ -107,7 +107,7 @@ SU_DEBUG_DEF(1)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_1(x) (SU_LOG_LEVEL >= 1 ? (su_debug_1 x) : (void)0)
+#define SU_DEBUG_1(x) (SU_LOG_LEVEL >= 1 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_1 x) : (void)0)
 #else
 #define SU_DEBUG_1(x) (void)1
 #endif
@@ -120,7 +120,7 @@ SU_DEBUG_DEF(2)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_2(x) (SU_LOG_LEVEL >= 2 ? (su_debug_2 x) : (void)0)
+#define SU_DEBUG_2(x) (SU_LOG_LEVEL >= 2 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_2 x) : (void)0)
 #else
 #define SU_DEBUG_2(x) (void)2
 #endif
@@ -133,7 +133,7 @@ SU_DEBUG_DEF(3)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_3(x) (SU_LOG_LEVEL >= 3 ? (su_debug_3 x) : (void)0)
+#define SU_DEBUG_3(x) (SU_LOG_LEVEL >= 3 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_3 x) : (void)0)
 #else
 #define SU_DEBUG_3(x) (void)3
 #endif
@@ -141,7 +141,7 @@ SU_DEBUG_DEF(3)
 #if SU_DEBUG_MAX >= 4
 SU_DEBUG_DEF(4)
 /** Log messages at level 4. */
-#define SU_DEBUG_4(x) (SU_LOG_LEVEL >= 4 ? (su_debug_4 x) : (void)0)
+#define SU_DEBUG_4(x) (SU_LOG_LEVEL >= 4 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_4 x) : (void)0)
 #else
 #define SU_DEBUG_4(x) (void)4
 #endif
@@ -155,7 +155,7 @@ SU_DEBUG_DEF(5)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_5(x) (SU_LOG_LEVEL >= 5 ? (su_debug_5 x) : (void)0)
+#define SU_DEBUG_5(x) (SU_LOG_LEVEL >= 5 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_5 x) : (void)0)
 #else
 #define SU_DEBUG_5(x) (void)5
 #endif
@@ -163,7 +163,7 @@ SU_DEBUG_DEF(5)
 #if SU_DEBUG_MAX >= 6
 SU_DEBUG_DEF(6)
 /** Log messages at level 6. */
-#define SU_DEBUG_6(x) (SU_LOG_LEVEL >= 6 ? (su_debug_6 x) : (void)0)
+#define SU_DEBUG_6(x) (SU_LOG_LEVEL >= 6 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_6 x) : (void)0)
 #else
 #define SU_DEBUG_6(x) (void)6
 #endif
@@ -176,7 +176,7 @@ SU_DEBUG_DEF(7)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_7(x) (SU_LOG_LEVEL >= 7 ? (su_debug_7 x) : (void)0)
+#define SU_DEBUG_7(x) (SU_LOG_LEVEL >= 7 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_7 x) : (void)0)
 #else
 #define SU_DEBUG_7(x) (void)7
 #endif
@@ -184,7 +184,7 @@ SU_DEBUG_DEF(7)
 #if SU_DEBUG_MAX >= 8
 SU_DEBUG_DEF(8)
 /** Log messages at level 8. */
-#define SU_DEBUG_8(x) (SU_LOG_LEVEL >= 8 ? (su_debug_8 x) : (void)0)
+#define SU_DEBUG_8(x) (SU_LOG_LEVEL >= 8 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_8 x) : (void)0)
 #else
 #define SU_DEBUG_8(x) (void)8
 #endif
@@ -198,7 +198,7 @@ SU_DEBUG_DEF(9)
  *
  * @sa su_llog(), su_vllog(), #su_log_t, @ref debug_logs
  */
-#define SU_DEBUG_9(x) (SU_LOG_LEVEL >= 9 ? (su_debug_9 x) : (void)0)
+#define SU_DEBUG_9(x) (SU_LOG_LEVEL >= 9 ? (su_log_set_line(SU_LOG, __FILE__, __LINE__), su_debug_9 x) : (void)0)
 #else
 #define SU_DEBUG_9(x) (void)9
 #endif
