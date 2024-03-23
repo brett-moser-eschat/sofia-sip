@@ -933,8 +933,8 @@ static int nua_session_client_response(nua_client_request_t *cr,
 {
   nua_handle_t *nh = cr->cr_owner;
   nua_dialog_usage_t *du = cr->cr_usage;
-  nua_dialog_state_t *ds = du->du_dialog;
-  nua_session_usage_t *ss = nua_dialog_usage_private(du);
+  nua_dialog_state_t *ds = (du != NULL?du->du_dialog:NULL);
+  nua_session_usage_t *ss = (du !=NULL?nua_dialog_usage_private(du):NULL);
 
   char const *sdp = NULL;
   size_t len;
