@@ -292,10 +292,6 @@ static void su_source_port_deinit(su_port_t *self)
 {
   su_base_port_deinit(self);
 
-  /*
-  g_mutex_free(self->sup_mutex);
-  g_mutex_free(self->sup_obtained);
-  */
   g_mutex_clear(self->sup_mutex);
   g_mutex_clear(self->sup_obtained);
 
@@ -402,13 +398,7 @@ gboolean su_source_prepare(GSource *gs, gint *return_tout)
 
   if (self->sup_base->sup_timers || self->sup_base->sup_deferrable) {
     su_time_t now;
-    /*
-    GTimeVal  gtimeval;
 
-    g_source_get_current_time(gs, &gtimeval);
-    now.tv_sec = gtimeval.tv_sec + 2208988800UL;
-    now.tv_usec = gtimeval.tv_usec;
-    */
     gint64 gtime = g_get_real_time();
     now.tv_sec = (gtime / 1000000);
     now.tv_usec = gtime - (now.tv_sec * 1000000);
@@ -475,18 +465,11 @@ gboolean su_source_dispatch(GSource *gs,
 
   if (self->sup_base->sup_timers || self->sup_base->sup_deferrable) {
     su_time_t now;
-    //GTimeVal  gtimeval;
     gint64 gtime;
     su_duration_t tout;
 
     tout = SU_DURATION_MAX;
 
-    /*
-    g_source_get_current_time(gs, &gtimeval);
-
-    now.tv_sec = gtimeval.tv_sec + 2208988800UL;
-    now.tv_usec = gtimeval.tv_usec;
-    */
     gtime = g_get_real_time();
     now.tv_sec = gtime / 1000000;
     now.tv_usec = gtime - (now.tv_sec * 1000000);
