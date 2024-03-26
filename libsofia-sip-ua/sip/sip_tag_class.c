@@ -213,53 +213,57 @@ int sip_add_tagis(msg_t *msg, sip_t *sip, tagi_t const **inout_list)
   tag_value_t value;
 
   if (!msg || !inout_list)
-    return -1;
+     return -1;
 
   if (sip == NULL)
-    sip = sip_object(msg);
+     sip = sip_object(msg);
 
   for (t = *inout_list; t; t = t_next(t)) {
-    tag = t->t_tag, value = t->t_value;
+     tag = t->t_tag, value = t->t_value;
 
-    if (tag == NULL || tag == siptag_end) {
-      t = t_next(t);
-      break;
-    }
+     if (tag == NULL || tag == siptag_end) {
+        t = t_next(t);
+        break;
+     }
 
-    if (!value)
-      continue;
+     if (!value)
+        continue;
 
-    if (SIPTAG_P(tag)) {
-      msg_hclass_t *hc = (msg_hclass_t *)tag->tt_magic;
-      msg_header_t *h = (msg_header_t *)value, **hh;
+     if (SIPTAG_P(tag)) {
+        msg_hclass_t *hc = (msg_hclass_t *)tag->tt_magic;
+        msg_header_t *h = (msg_header_t *)value, **hh;
 
-      if (h == SIP_NONE) {	/* Remove header */
-	hh = msg_hclass_offset(msg_mclass(msg), (msg_pub_t *)sip, hc);
-	if (hh != NULL &&
-	    (char *)hh < ((char *)sip + sip->sip_size) &&
-	    (char *)hh >= (char *)&sip->sip_request) {
-	  while (*hh)
-	    msg_header_remove(msg, (msg_pub_t *)sip, *hh);
-	}
-	continue;
-      }
+        if (h == SIP_NONE) {	/* Remove header */
+           hh = msg_hclass_offset(msg_mclass(msg), (msg_pub_t *)sip, hc);
+           if (hh != NULL &&
+                 (char *)hh < ((char *)sip + sip->sip_size) &&
+                 (char *)hh >= (char *)&sip->sip_request) {
+              while (*hh)
+                 msg_header_remove(msg, (msg_pub_t *)sip, *hh);
+           }
+           continue;
+        }
 
-      if (tag == siptag_header)
-	hc = h->sh_class;
+        if (tag == siptag_header)
+           hc = h->sh_class;
 
-      if (msg_header_add_dup_as(msg, (msg_pub_t *)sip, hc, h) < 0)
-	break;
-    }
-    else if (SIPTAG_STR_P(tag)) {
-      msg_hclass_t *hc = (msg_hclass_t *)tag->tt_magic;
-      char const *s = (char const *)value;
-      if (s && msg_header_add_make(msg, (msg_pub_t *)sip, hc, s) < 0)
-	return -1;
-    }
-    else if (tag == siptag_header_str) {
-      if (msg_header_add_str(msg, (msg_pub_t *)sip, (char const *)value) < 0)
-	return -1;
-    }
+        if (msg_header_add_dup_as(msg, (msg_pub_t *)sip, hc, h) < 0)
+           break;
+     }
+     else if (SIPTAG_STR_P(tag)) {
+        msg_hclass_t *hc = (msg_hclass_t *)tag->tt_magic;
+        char const *s = (char const *)value;
+        if (s && msg_header_add_make(msg, (msg_pub_t *)sip, hc, s) < 0)
+        {
+           return -1;
+        }
+     }
+     else if (tag == siptag_header_str) {
+        if (msg_header_add_str(msg, (msg_pub_t *)sip, (char const *)value) < 0)
+        {
+           return -1;
+        }
+     }
   }
 
   *inout_list = t;
