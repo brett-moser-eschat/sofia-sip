@@ -2407,7 +2407,9 @@ int msg_header_add(msg_t *msg,
   msg_header_t **head, *old = NULL, *end;
 
   if (msg == NULL || h == NULL || h == MSG_HEADER_NONE || hh == NULL)
+  {
     return -1;
+  }
   if (pub == NULL)
     pub = msg->m_object;
 
@@ -2525,7 +2527,10 @@ int msg_header_prepend(msg_t *msg,
   return 0;
 }
 
-
+// TM 2024/03/26 - This function is failing when built with -O1 or -O2.
+//  I do not no why. Forcing to -O0 as a work-around for now.
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 /** Find place to insert header of the class @a hc. */
 msg_header_t **
 msg_hclass_offset(msg_mclass_t const *mc, msg_pub_t const *mo, msg_hclass_t *hc)
@@ -2535,23 +2540,28 @@ msg_hclass_offset(msg_mclass_t const *mc, msg_pub_t const *mo, msg_hclass_t *hc)
   assert(mc && hc);
 
   if (mc == NULL || hc == NULL)
-    return NULL;
+     return NULL;
 
   if (hc->hc_hash > 0) {
-    unsigned j, N = mc->mc_hash_size;
-    for (j = hc->hc_hash % N; mc->mc_hash[j].hr_class; j = (j + 1) % N)
-      if (mc->mc_hash[j].hr_class == hc) {
-	return (msg_header_t **)((char *)mo + mc->mc_hash[j].hr_offset);
-      }
+     unsigned j, N = mc->mc_hash_size;
+     for (j = hc->hc_hash % N; mc->mc_hash[j].hr_class; j = (j + 1) % N)
+     {
+        if (mc->mc_hash[j].hr_class == hc) {
+           return (msg_header_t **)((char *)mo + mc->mc_hash[j].hr_offset);
+        }
+     }
   }
   else
-    /* Header has no name. */
-    for (i = 0; i <= 6; i++)
-      if (hc->hc_hash == mc->mc_request[i].hr_class->hc_hash)
-	return (msg_header_t **)((char *)mo + mc->mc_request[i].hr_offset);
+     /* Header has no name. */
+     for (i = 0; i <= 6; i++)
+     {
+        if (hc->hc_hash == mc->mc_request[i].hr_class->hc_hash)
+           return (msg_header_t **)((char *)mo + mc->mc_request[i].hr_offset);
+     }
 
   return NULL;
 }
+#pragma GCC pop_options
 
 /** Append a parsed header object into the message structure */
 su_inline void
@@ -2762,7 +2772,9 @@ int msg_header_add_make(msg_t *msg,
   hh = msg_hclass_offset(msg->m_class, pub, hc);
 
   if (hh == NULL)
-    return -1;
+  {
+     return -1;
+  }
 
   if (!s)
     return 0;
@@ -2786,13 +2798,17 @@ int msg_header_add_make(msg_t *msg,
     s0 = su_strdup(msg_home(msg), s);
 
     if (!s0 || msg_commalist_d(msg_home(msg), &s0, d, msg_token_scan) < 0)
+    {
       return -1;
+    }
 
     return 0;
   }
 
   if (!(h = msg_header_make(msg_home(msg), hc, s)))
-    return -1;
+  {
+     return -1;
+  }
 
   return msg_header_add(msg, pub, hh, h);
 }
@@ -2864,7 +2880,9 @@ int msg_header_add_str(msg_t *msg,
   s = su_strdup(msg_home(msg), str);
 
   if (s == NULL)
-    return -1;
+  {
+     return -1;
+  }
 
   return msg_header_parse_str(msg, pub, s);
 }
@@ -2894,30 +2912,32 @@ int msg_header_parse_str(msg_t *msg,
     return -1;
 
   if (pub == NULL)
-    pub = msg->m_object;
+     pub = msg->m_object;
 
   if (s) {
-    size_t ssiz = strlen(s), used = 0;
-    ssize_t n = 1;
+     size_t ssiz = strlen(s), used = 0;
+     ssize_t n = 1;
 
-    while (ssiz > used) {
-      if (IS_CRLF(s[used]))
-	break;
-      n = msg_extract_header(msg, pub, s + used, ssiz - used, 1);
-      if (n <= 0)
-	break;
-      used += n;
-    }
+     while (ssiz > used) {
+        if (IS_CRLF(s[used]))
+           break;
+        n = msg_extract_header(msg, pub, s + used, ssiz - used, 1);
+        if (n <= 0)
+           break;
+        used += n;
+     }
 
-    if (n > 0 && ssiz > used) {
-      used += CRLF_TEST(s + used);
-      if (ssiz > used)
-	msg_extract_payload(msg, pub, NULL, ssiz - used,
-			    s + used, ssiz - used, 1);
-    }
+     if (n > 0 && ssiz > used) {
+        used += CRLF_TEST(s + used);
+        if (ssiz > used)
+           msg_extract_payload(msg, pub, NULL, ssiz - used,
+                 s + used, ssiz - used, 1);
+     }
 
-    if (n <= 0)
-      return -1;
+     if (n <= 0)
+     {
+        return -1;
+     }
   }
 
   return 0;
