@@ -900,6 +900,11 @@ int tls_connect(su_root_magic_t *magic, su_wait_t *w, tport_t *self)
   if (self->tp_is_connected == 0) {
     int ret, status;
 
+    if (!self->tp_accepted) {
+      // Configure SNI if we are the client
+      SSL_set_tlsext_host_name(tls->con, self->tp_canon);
+    }
+
     ret = self->tp_accepted ? SSL_accept(tls->con) : SSL_connect(tls->con);
     status = SSL_get_error(tls->con, ret);
 
